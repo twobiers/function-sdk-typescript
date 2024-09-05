@@ -14,11 +14,15 @@ type MTLSCertificates = {
     ca: string;
 }
 
-export function loadMTLSCertificates(dir: string): MTLSCertificates {
+export function loadMTLSCertificates(dir?: string): MTLSCertificates | Record<string, never> {
+    if (!dir) {
+        return {};
+    }
+
     return {
         key: readFileSync(path.join(dir, "tls.key"), "utf8"),
-        cert: readFileSync(path.join("tls.crt"), "utf8"),
-        ca: readFileSync(path.join("ca.crt"), "utf8"),
+        cert: readFileSync(path.join(dir, "tls.crt"), "utf8"),
+        ca: readFileSync(path.join(dir, "ca.crt"), "utf8"),
     }
 }
 
