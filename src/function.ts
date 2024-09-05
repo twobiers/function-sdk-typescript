@@ -5,10 +5,32 @@ import { FunctionRunnerService as v1beta1FunctionRunnerService } from "../gen/v1
 import { fastify } from "fastify";
 import { fastifyConnectPlugin } from "@connectrpc/connect-fastify";
 import { PartialMessage } from "@bufbuild/protobuf";
+import { readFileSync } from "fs";
+import path from "path";
 
-export async function newFunction(fn: (req: v1.RunFunctionRequest) => PartialMessage<v1.RunFunctionResponse>) {
+type MTLSCertificates = {
+    key: string;
+    cert: string;
+    ca: string;
+}
+
+export function loadMTLSCertificates(dir: string): MTLSCertificates {
+    return {
+        key: readFileSync(path.join(dir, "tls.key"), "utf8"),
+        cert: readFileSync(path.join("tls.crt"), "utf8"),
+        ca: readFileSync(path.join("ca.crt"), "utf8"),
+    }
+}
+
+export async function newFunction(
+    fn: (req: v1.RunFunctionRequest) => PartialMessage<v1.RunFunctionResponse>,
+    certs: MTLSCertificates
+) {
     const server = fastify({
-        http2: true
+        http2: true,
+        https: {
+            ...certs
+        }
     });
     await server.register(fastifyConnectPlugin, {
         routes(router) {
