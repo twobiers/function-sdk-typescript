@@ -42,7 +42,7 @@ jobs:
           git config user.name github-actions[bot]
           git config user.email 41898282+github-actions[bot]@users.noreply.github.com
 
-      - run: npm version from-git
+      - run: npm --no-git-tag-version version from-git
       - run: npm ci
       - run: npm run build
       - run: npm publish --access public --provenance
