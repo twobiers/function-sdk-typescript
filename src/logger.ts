@@ -1,5 +1,13 @@
 import pino, { LoggerOptions } from "pino";
 
-function getLogger(opts: Pick<LoggerOptions, "level">) {
-    return pino(opts);
+let loggerOptions: LoggerOptions = {};
+
+export function setOpts(opts: Pick<LoggerOptions, "level">) {
+    loggerOptions = {
+        ...opts
+    };
+}
+
+export function getLogger() {
+    return pino(loggerOptions);
 }
