@@ -1,7 +1,22 @@
 {
+  "name": "function-sdk-typescript",
+  "version": "0.0.1",
+  "license": "Apache-2.0",
+  "description": "Crossplane Function SDK to build composition functions in TypeScript",
+  "homepage": "https://github.com/twobiers/function-sdk-typescript",
+  "author": "twobiers",
+  "type": "module",
   "scripts": {
+    "build": "tsc",
     "generate": "buf generate",
     "test": "node --test"
+  },
+  "dependencies": {
+    "@connectrpc/connect-fastify": "^1.4.0",
+    "@connectrpc/connect-node": "^1.4.0",
+    "@kubernetes/client-node": "^0.21.0",
+    "fastify": "^4.28.1",
+    "yargs": "^17.7.2"
   },
   "devDependencies": {
     "@bufbuild/buf": "^1.39.0",
@@ -9,12 +24,16 @@
     "@bufbuild/protoc-gen-es": "^1.10.0",
     "@connectrpc/connect": "^1.4.0",
     "@connectrpc/protoc-gen-connect-es": "^1.4.0",
+    "@types/yargs": "^17.0.33",
     "typescript": "^5.5.4"
   },
-  "dependencies": {
-    "@connectrpc/connect-fastify": "^1.4.0",
-    "@connectrpc/connect-node": "^1.4.0",
-    "@kubernetes/client-node": "^0.21.0",
-    "fastify": "^4.28.1"
-  }
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/twobiers/function-sdk-typescript.git"
+  },
+  "keywords": [
+    "crossplane",
+    "function",
+    "sdk"
+  ]
 }

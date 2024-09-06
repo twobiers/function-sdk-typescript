@@ -1,7 +1,7 @@
 import * as v1 from "./gen/v1/run_function_pb"
 import * as v1beta1 from "./gen/v1beta1/run_function_pb"
-import { FunctionRunnerService as v1FunctionRunnerService } from "../gen/v1/run_function_connect";
-import { FunctionRunnerService as v1beta1FunctionRunnerService } from "../gen/v1beta1/run_function_connect";
+import { FunctionRunnerService as v1FunctionRunnerService } from "./gen/v1/run_function_connect";
+import { FunctionRunnerService as v1beta1FunctionRunnerService } from "./gen/v1beta1/run_function_connect";
 import { fastify } from "fastify";
 import { fastifyConnectPlugin } from "@connectrpc/connect-fastify";
 import { PartialMessage } from "@bufbuild/protobuf";
@@ -12,6 +12,11 @@ type MTLSCertificates = {
     key: string;
     cert: string;
     ca: string;
+}
+
+export type FunctionServeOpts = {
+    insecure: boolean;
+    mtlsCertificates: MTLSCertificates;
 }
 
 export function loadMTLSCertificates(dir?: string): MTLSCertificates | Record<string, never> {
@@ -26,14 +31,14 @@ export function loadMTLSCertificates(dir?: string): MTLSCertificates | Record<st
     }
 }
 
-export async function newFunction(
+export async function serve(
     fn: (req: v1.RunFunctionRequest) => PartialMessage<v1.RunFunctionResponse>,
-    certs: MTLSCertificates
+    opts: FunctionServeOpts
 ) {
     const server = fastify({
         http2: true,
         https: {
-            ...certs
+            ...opts.mtlsCertificates
         }
     });
     await server.register(fastifyConnectPlugin, {
@@ -50,17 +55,17 @@ export async function newFunction(
                 })
                 .service(v1beta1FunctionRunnerService, {
                     async runFunction(request, _context) {
-                        const b = request.toBinary();
-                        const gareq = v1.RunFunctionRequest.fromBinary(b);
+                        const betaBinary = request.toBinary();
+                        const stableRequest = v1.RunFunctionRequest.fromBinary(betaBinary);
 
-                        const garsp = new v1.RunFunctionResponse(fn(gareq));
+                        const stableResponse = new v1.RunFunctionResponse(fn(stableRequest));
 
-                        const bResp = garsp.toBinary();
-                        return v1beta1.RunFunctionResponse.fromBinary(bResp);
+                        const stableResponseBinary = stableResponse.toBinary();
+                        return v1beta1.RunFunctionResponse.fromBinary(stableResponseBinary);
                     }
                 });
         },
     });
-    await server.listen({ host: "localhost", port: 8443 });
+    await server.listen({ host: "localhost", port: 9443 });
     console.log("server is listening at", server.addresses());
 }
