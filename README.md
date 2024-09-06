@@ -8,4 +8,5 @@ write composition functions in TypeScript and to asses the options it provides.
 If you just want to jump in and get started, consider using the [function-template-typescript] 
 template repository.
 
+[contributing guidelines]: https://github.com/crossplane/crossplane/tree/master/contributing
 [function-template-typescript]: https://github.com/twobiers/function-template-typescript
