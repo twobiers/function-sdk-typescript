@@ -1,6 +1,6 @@
 {
   "name": "function-sdk-typescript",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "license": "Apache-2.0",
   "description": "Crossplane Function SDK to build composition functions in TypeScript",
   "homepage": "https://github.com/twobiers/function-sdk-typescript",
