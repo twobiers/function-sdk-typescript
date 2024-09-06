@@ -16,7 +16,7 @@ type MTLSCertificates = {
 
 export type FunctionServeOpts = {
     insecure: boolean;
-    mtlsCertificates: MTLSCertificates;
+    mtlsCertificates: MTLSCertificates | Record<string, never>;
 }
 
 export function loadMTLSCertificates(dir?: string): MTLSCertificates | Record<string, never> {
@@ -32,7 +32,7 @@ export function loadMTLSCertificates(dir?: string): MTLSCertificates | Record<st
 }
 
 export async function serve(
-    fn: (req: v1.RunFunctionRequest) => PartialMessage<v1.RunFunctionResponse>,
+    fn: (req: v1.RunFunctionRequest) => Promise<PartialMessage<v1.RunFunctionResponse>>,
     opts: FunctionServeOpts
 ) {
     const server = fastify({
@@ -48,7 +48,7 @@ export async function serve(
                     async runFunction(request, _context) {
                         const b = request.toBinary();
                         const req = v1.RunFunctionRequest.fromBinary(b);
-                        const rsp = new v1.RunFunctionResponse(fn(req));
+                        const rsp = new v1.RunFunctionResponse(await fn(req));
 
                         return rsp;
                     }
@@ -58,7 +58,7 @@ export async function serve(
                         const betaBinary = request.toBinary();
                         const stableRequest = v1.RunFunctionRequest.fromBinary(betaBinary);
 
-                        const stableResponse = new v1.RunFunctionResponse(fn(stableRequest));
+                        const stableResponse = new v1.RunFunctionResponse(await fn(stableRequest));
 
                         const stableResponseBinary = stableResponse.toBinary();
                         return v1beta1.RunFunctionResponse.fromBinary(stableResponseBinary);
